@@ -1,5 +1,7 @@
 # aida
-AIDA is a dtrAck2 lInked Device Api. In other words, you can configure and access your [Advanced Realtime Tracking](www.ar-tracking.com) system via our [Linked (Data REST) API](http://answers.semanticweb.com/questions/2763/the-relation-of-linked-datasemantic-web-to-rest). In many aspects, AIDA provides an implementation of the upcoming [W3C Web Thing Model](https://www.w3.org/Submission/wot-model/).
+AIDA is a dtrAck2 lInked Device Api. 
+
+In some more words, you can configure and access your [Advanced Realtime Tracking](www.ar-tracking.com) system via our [Linked (Data REST) API](http://answers.semanticweb.com/questions/2763/the-relation-of-linked-datasemantic-web-to-rest). In many aspects, AIDA provides an implementation of the upcoming [W3C Web Thing Model](https://www.w3.org/Submission/wot-model/).
 
 ## Installation & Running
 Run AIDA on your localhost by typing
