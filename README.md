@@ -16,9 +16,9 @@ You can modify AIDA listening port in the `pom.xml`
 		<plugin>
 			<groupId>org.apache.tomcat.maven</groupId>
 			<artifactId>tomcat7-maven-plugin</artifactId>
-			<version>2.2</version>  	
-            		<configuration>
-				<server>fReSCO</server>
+			<version>2.2</version>
+			<configuration>
+				<server>aida</server>
 				<port>8080</port>
 				<path>/</path>
 			</configuration>
