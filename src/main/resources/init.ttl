@@ -1,0 +1,16 @@
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix lts:  <http://www.dfki.de/resc01/ns/lts#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://localhost:8080/> .
+
+<api> 
+  rdf:type ART:DTrack2 , actn:ActionableResource ;
+  lts:model <api/model> ;
+  dct:description  "Linked API for DTrack2 Controller" ;
+  ART:deviceState  ART:Unconfigured ;
+  actn:action <api/actions/configure> .

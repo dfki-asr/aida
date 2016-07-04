@@ -1,0 +1,42 @@
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@base <http://localhost:8080/>
+
+<api/actions/startMeasurement>
+  rdf:type ART:StartMeasurementAction , actn:NonSafe , actn:Idempotent ;
+  dct:description  "Allows to start measurements using the DTrack2 Controller" ;
+  actn:binding     []  ;
+  actn:consumes [
+    rdf:type sp:Ask ;
+    sp:where  () 
+  ] ;
+  actn:produces [
+    sp:text "ASK { dtrack:api ART:deviceState ART:Started ; actn:action actions:stopMeasurement , actions:listBodies . FILTER NOT EXISTS { dtrack:api actn:action [ rdf:type actions:ConfigurationAction ] , [ rdf:type actions:StartMeasurementAction ] . } }" ;
+    rdf:type sp:Ask ;
+    sp:where (
+      [ sp:object ART:DTrack2 ;
+        sp:predicate rdf:type ;
+        sp:subject <api> ]
+      [ sp:object ART:Started ;
+        sp:predicate  ART:deviceState ;
+        sp:subject <api> ]
+      [ sp:object     <api/actions/stopMeasurement> ;
+        sp:predicate  actn:action ;
+        sp:subject <api> ]
+      [ a sp:Filter ;
+        sp:expression  [ 
+          rdf:type sp:notExists ;
+          sp:elements (
+            [ sp:object <api/actions/startMeasurement> ;
+              sp:predicate  actn:action ;
+              sp:subject <api> ]
+          )
+        ]
+      ]
+    )
+  ] .

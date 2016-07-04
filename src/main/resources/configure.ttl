@@ -1,0 +1,59 @@
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@base <http://localhost:8080/> .
+
+<api/actions/configure>
+  rdf:type ART:ConfigurationAction , actn:NonSafe , actn:Idempotent ;
+  dct:description  "Allows to configure the DTrack2 Controller" ;
+  actn:binding []  ;
+  actn:consumes [
+    sp:text "ASK { dtrack:api ART:serverHost ?host ; ART:serverPort ?hostPort ; ART:dataPort ?clientPort . }" ; 
+    rdf:type sp:Ask ;
+    sp:where (
+      [ sp:object [ sp:varName  "host" ] ;
+        sp:predicate ART:serverHost ;
+        sp:subject <api> ]
+      [ sp:object [ sp:varName  "hostPort" ] ;
+        sp:predicate ART:serverPort ;
+        sp:subject <api> ]
+      [ sp:object [ sp:varName  "clientPort" ] ;
+        sp:predicate ART:dataPort ;
+        sp:subject <api> ]
+    )
+  ] ;
+  actn:produces [
+    sp:text "ASK WHERE { dtrack:api ART:deviceState 'configured' . dtrack:api actn:action [ a ART:StartMeasurementAction ] . FILTER NOT EXISTS { dtrack:api ART:deviceState 'unconfigured' ; actn:action [ rdf:type ART:ConfigurationAction ] } }" ;
+    rdf:type sp:Ask ;
+    sp:where (
+      [ sp:object ART:Configured ;
+        sp:predicate ART:deviceState ;
+        sp:subject <api> ]
+      [ sp:object [ sp:varName  "?0" ] ;
+        sp:predicate actn:action ;
+        sp:subject <api> ]
+      [ sp:object ART:StartMeasurementAction ;
+        sp:predicate  rdf:type ;
+        sp:subject [ sp:varName  "?0" ] ]
+      [ a sp:Filter ;
+        sp:expression [ 
+          rdf:type sp:notExists ;
+          sp:elements (
+            [ sp:object ART:Unconfigured ;
+              sp:predicate  ART:deviceState ;
+              sp:subject <api> ]
+            [ sp:object [ sp:varName  "?1" ] ;
+              sp:predicate  actn:action ;
+              sp:subject <api> ]
+            [ sp:object     ART:ConfigurationAction ;
+              sp:predicate  rdf:type ;
+              sp:subject    [ sp:varName  "?1" ] ]
+          )
+        ]
+      ]
+    )
+  ] .

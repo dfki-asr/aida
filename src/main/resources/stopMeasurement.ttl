@@ -1,0 +1,49 @@
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@base <http://localhost:8080/> .
+
+<api/actions/stopMeasurement>
+        a                actn:NonSafe , actn:Idempotent , ART:StopMeasurementAction ;
+        dct:description  "Allows to start measurements using the DTrack2 Controller" ;
+        actn:binding     []  ;
+        actn:consumes    [ a         sp:Ask ;
+                           sp:where  ()
+                         ] ;
+        actn:produces    [ a         sp:Ask ;
+                           sp:text   "ASK { dtrack:api actn:action actions:StartMeasurementAction; ART:deviceState 'stopped' . FILTER NOT EXISTS { dtrack:api actn:action [ rdf:type actions:ConfigurationAction ] , [ rdf:type actions:StopMeasurementAction ] . } }" ;
+                           sp:where  ( [ sp:object     <api/actions/startMeasurement> ;
+                                         sp:predicate  actn:action ;
+                                         sp:subject    <api>
+                                       ]
+                                       [ sp:object     ART:Stopped ;
+                                         sp:predicate  ART:deviceState ;
+                                         sp:subject    <api>
+                                       ]
+                                       [ a              sp:Filter ;
+                                         sp:expression  [ a            sp:notExists ;
+                                                          sp:elements  ( [ sp:object     [ sp:varName  "?0" ] ;
+                                                                           sp:predicate  actn:action ;
+                                                                           sp:subject    <api>
+                                                                         ]
+                                                                         [ sp:object     <api/actions/configure> ;
+                                                                           sp:predicate  rdf:type ;
+                                                                           sp:subject    [ sp:varName  "?0" ]
+                                                                         ]
+                                                                         [ sp:object     [ sp:varName  "?1" ] ;
+                                                                           sp:predicate  actn:action ;
+                                                                           sp:subject    <api>
+                                                                         ]
+                                                                         [ sp:object     <api/actions/stopMeasurement> ;
+                                                                           sp:predicate  rdf:type ;
+                                                                           sp:subject    [ sp:varName  "?1" ]
+                                                                         ]
+                                                                       )
+                                                        ]
+                                       ]
+                                     )
+                         ] .
