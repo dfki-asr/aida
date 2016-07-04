@@ -21,6 +21,7 @@ public final class ART
   public static final Resource ConfigurationAction = resource(CONSTANTS.CLASS_ConfigurationAction);
   public static final Resource StartMeasurementAction = resource(CONSTANTS.CLASS_StartMeasurementAction);
   public static final Resource StopMeasurementAction = resource(CONSTANTS.CLASS_StopMeasurementAction);
+  public static final Resource TearDownAction = resource(CONSTANTS.CLASS_TearDownAction);
   public static final Resource TreeTarget = resource(CONSTANTS.CLASS_TreeTarget);
   public static final Resource Target = resource(CONSTANTS.CLASS_Target);
   public static final Resource DTrack2 = resource(CONSTANTS.CLASS_DTrack2);
@@ -73,9 +74,10 @@ public final class ART
     private static final String CLASS_ConfigurationAction = nsName(CLASS_LNAME_ConfigurationAction);
     private static final String CLASS_LNAME_StartMeasurementAction = "StartMeasurementAction";
     private static final String CLASS_StartMeasurementAction = nsName(CLASS_LNAME_StartMeasurementAction);
-    
     private static final String CLASS_LNAME_StopMeasurementAction = "StopMeasurementAction";
     private static final String CLASS_StopMeasurementAction = nsName(CLASS_LNAME_StopMeasurementAction);
+    private static final String CLASS_LNAME_TearDownAction = "TearDownAction";
+    private static final String CLASS_TearDownAction = nsName(CLASS_LNAME_TearDownAction);
     private static final String CLASS_LNAME_TreeTarget = "TreeTarget";
     private static final String CLASS_TreeTarget = nsName(CLASS_LNAME_TreeTarget);
     private static final String CLASS_LNAME_Target = "Target";

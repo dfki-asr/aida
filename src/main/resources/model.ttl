@@ -8,7 +8,7 @@
 <api>
   rdf:type lts:StateMachine ;
   lts:stateIndicator ART:deviceState ;
-  lts:contains _:s1 , _:s2 , _:s3 , _:t1 , _:t2 , _:t3 .
+  lts:contains _:s1 , _:s2 , _:s3 , _:t1 , _:t2 , _:t3 , _:t4 .
  
  _:s1
    rdf:type lts:Initial ;
@@ -40,3 +40,9 @@ _:t2
   lts:source _:s3 ;
   lts:target _:s2 ; 
   lts:label <api/actions/stopMeasurement> .
+
+ _:t4 
+  rdf:type lts:Transition ;
+  lts:source _:s2 ;
+  lts:target _:s1 ; 
+  lts:label <api/actions/tearDown> .

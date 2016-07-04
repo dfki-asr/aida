@@ -1,3 +1,8 @@
+/*
+ * This file is part of aida. It is subject to the license terms in
+ * the LICENSE file found in the top-level directory of this distribution.
+ * You may not use this file except in compliance with the License.
+ */
 package de.dfki.resc28.aida.actions;
 
 import org.apache.jena.rdf.model.Model;
@@ -39,6 +44,10 @@ public class DTrackActionController extends ActionController
 		else if (action.hasProperty(RDF.type, ART.StartMeasurementAction))
 		{
 			return new StartMeasurementAction(actionURI, fGraphStore);
+		}
+		else if (action.hasProperty(RDF.type, ART.TearDownAction))
+		{
+			return new TearDownAction(actionURI, fGraphStore);
 		}
 		else if (action.hasProperty(RDF.type, ACTN.Action))
 		{
