@@ -1,0 +1,22 @@
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp:    <http://spinrdf.org/sp#> .
+@base <http://localhost:8080/>
+
+<api/actions/tearDown>
+  rdf:type ART:TearDownAction , actn:NonSafe , actn:Idempotent ;
+  dct:description  "Allows to tear down the DTrack2 Controller" ;
+  actn:binding     []  ;
+  actn:consumes [
+    rdf:type sp:Ask ;
+    sp:where  () 
+  ] ;
+  actn:produces [
+    sp:text "ASK { dtrack:api ART:deviceState ART:Started ; actn:action actions:stopMeasurement , actions:listBodies . FILTER NOT EXISTS { dtrack:api actn:action [ rdf:type actions:ConfigurationAction ] , [ rdf:type actions:StartMeasurementAction ] . } }" ;
+    rdf:type sp:Ask ;
+    sp:where ()
+  ] .
