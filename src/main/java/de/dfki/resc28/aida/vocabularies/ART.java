@@ -73,6 +73,7 @@ public final class ART
     private static final String CLASS_ConfigurationAction = nsName(CLASS_LNAME_ConfigurationAction);
     private static final String CLASS_LNAME_StartMeasurementAction = "StartMeasurementAction";
     private static final String CLASS_StartMeasurementAction = nsName(CLASS_LNAME_StartMeasurementAction);
+    
     private static final String CLASS_LNAME_StopMeasurementAction = "StopMeasurementAction";
     private static final String CLASS_StopMeasurementAction = nsName(CLASS_LNAME_StopMeasurementAction);
     private static final String CLASS_LNAME_TreeTarget = "TreeTarget";

@@ -32,13 +32,13 @@ public class DTrackActionController extends ActionController
 		{
 			return new ConfigurationAction(actionURI, fGraphStore);
 		}
-		else if (action.hasProperty(RDF.type, ART.StartMeasurementAction))
-		{
-			return new StartMeasurementAction(actionURI, fGraphStore);
-		}
 		else if (action.hasProperty(RDF.type, ART.StopMeasurementAction))
 		{
 			return new StopMeasurementAction(actionURI, fGraphStore);
+		}
+		else if (action.hasProperty(RDF.type, ART.StartMeasurementAction))
+		{
+			return new StartMeasurementAction(actionURI, fGraphStore);
 		}
 		else if (action.hasProperty(RDF.type, ACTN.Action))
 		{

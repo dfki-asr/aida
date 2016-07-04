@@ -9,7 +9,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import de.dfki.resc28.sodalite.vocabularies.ACTN;
 import de.dfki.resc28.aida.vocabularies.ART;
 import de.dfki.resc28.aida.vocabularies.SPATIAL;
 import de.dfki.resc28.art4j.DTrackSDK;
@@ -29,44 +28,31 @@ public class StartMeasurementAction extends Action implements IAction
 	public Set<String> getAllowedMethods() 
 	{
 		Set<String> allow = super.getAllowedMethods();
-		allow.add(HttpMethod.GET);
+		allow.add(HttpMethod.POST);
 	    return allow;
 	}
 
 	public Model performTasks(Model consumable) 
 	{
+		Model currentState = fGraphStore.getDefaultGraph();
+		Resource tracker = currentState.listSubjectsWithProperty(RDF.type, ART.DTrack2).next().asResource();
+		
 		DTrackSDK.getInstance().startMeasurement();
-		return consumable;
-	}
-	
-	public Model updateState(Model consumable) 
-	{
-		Model trackerModel = fGraphStore.getNamedGraph("http://localhost:8080/api/model");
-		Resource tracker = trackerModel.listSubjectsWithProperty(RDF.type, ART.DTrack2).next();
-		Resource startMeasurementAction = trackerModel.listSubjectsWithProperty(RDF.type, ART.StartMeasurementAction).next();
-		Resource stopMeasurementAction = trackerModel.listSubjectsWithProperty(RDF.type, ART.StopMeasurementAction).next();
 		
 		// create containers for targets and coordinateSystems
 		Model targetContainerModel = ModelFactory.createDefaultModel();
 		Resource targetContainer = targetContainerModel.createResource("http://localhost:8080/api/targets");
 		targetContainerModel.add(targetContainer, RDF.type, ART.TargetContainer);
-		fGraphStore.createNamedGraph("http://localhost:8080/api/targets", targetContainerModel);
-		
+		fGraphStore.createNamedGraph(targetContainer.getURI().toString(), targetContainerModel);
+
 		Model coordinateSystemContainerModel = ModelFactory.createDefaultModel();
 		Resource coordinateSystemContainer = coordinateSystemContainerModel.createResource("http://localhost:8080/api/coordinateSystems");
 		coordinateSystemContainerModel.add(coordinateSystemContainer, RDF.type, ART.CoordinateSystemContainer);
-		fGraphStore.createNamedGraph("http://localhost:8080/api/coordinateSystems", coordinateSystemContainerModel);
-
-		// update the device state
-		Model trackerState = fGraphStore.getDefaultGraph();
-		trackerState.add(tracker, ACTN.action, stopMeasurementAction);
-		trackerState.remove(tracker, ACTN.action, startMeasurementAction);
-		trackerState.add(tracker, ART.deviceState, trackerState.createTypedLiteral("started"));
-		trackerState.remove(tracker, ART.deviceState, trackerState.createTypedLiteral("configured"));
-		trackerState.add(tracker, SPATIAL.spatialRelationship, targetContainer);
-		trackerState.add(tracker, SPATIAL.coordinateSystem, coordinateSystemContainer);
-		fGraphStore.replaceDefaultGraph(trackerState);
+		fGraphStore.createNamedGraph(coordinateSystemContainer.getURI().toString(), coordinateSystemContainerModel);	
+			
+		currentState.add(tracker, SPATIAL.spatialRelationship, targetContainer);
+		currentState.add(tracker, SPATIAL.coordinateSystem, coordinateSystemContainer);
 		
-		return trackerState;
+		return currentState;
 	}
 }

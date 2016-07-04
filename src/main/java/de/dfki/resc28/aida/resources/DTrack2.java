@@ -15,6 +15,7 @@ import de.dfki.resc28.flapjack.resources.IResource;
 import de.dfki.resc28.flapjack.resources.Resource;
 import de.dfki.resc28.igraphstore.IGraphStore;
 
+// TODO: Implement ActionableResource subclass
 public class DTrack2 extends Resource implements IResource
 {
 
@@ -24,7 +25,9 @@ public class DTrack2 extends Resource implements IResource
 		this.fRDFType = ART.DTrack2;
 		
 		if (this.fGraphStore.getDefaultGraph().isEmpty())
-			fGraphStore.replaceDefaultGraph(fGraphStore.getNamedGraph(fURI));
+		{
+			fGraphStore.replaceDefaultGraph(fGraphStore.getNamedGraph(fURI + "/model/initial"));
+		}
 	}
 	
 	public Response read(final String contentType)
