@@ -5,20 +5,13 @@
  */
 package de.dfki.resc28.aida.actions;
 
-import java.util.Set;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
 
 import de.dfki.resc28.aida.vocabularies.ART;
-import de.dfki.resc28.art4j.DTrackSDK;
 import de.dfki.resc28.igraphstore.IGraphStore;
 import de.dfki.resc28.sodalite.actions.Action;
 import de.dfki.resc28.sodalite.actions.IAction;
-import de.dfki.resc28.sodalite.vocabularies.ACTN;
 
 public class TearDownAction extends Action implements IAction {
 
@@ -26,13 +19,6 @@ public class TearDownAction extends Action implements IAction {
 	{
 		super(actionURI, graphStore);
 		this.fRDFType = ART.TearDownAction;
-	}
-
-	public Set<String> getAllowedMethods() 
-	{
-		Set<String> allow = super.getAllowedMethods();
-		allow.add("PATCH");
-	    return allow;
 	}
 
 	public Model performTasks(Model consumable) 

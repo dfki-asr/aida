@@ -5,10 +5,6 @@
  */
 package de.dfki.resc28.aida.actions;
 
-import java.util.Set;
-
-import javax.ws.rs.HttpMethod;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -29,13 +25,6 @@ public class StopMeasurementAction extends Action implements IAction
 	{
 		super(actionURI, graphStore);
 		this.fRDFType = ART.StopMeasurementAction;
-	}
-
-	public Set<String> getAllowedMethods() 
-	{
-		Set<String> allow = super.getAllowedMethods();
-		allow.add(HttpMethod.POST);
-	    return allow;
 	}
 
 	public Model performTasks(Model consumable) 

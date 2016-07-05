@@ -5,8 +5,6 @@
  */
 package de.dfki.resc28.aida.actions;
 
-import java.util.Set;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -28,13 +26,6 @@ public class ConfigurationAction extends Action implements IAction
 	{
 		super(actionURI, graphStore);
 		this.fRDFType = ART.ConfigurationAction;
-	}
-
-	public Set<String> getAllowedMethods() 
-	{
-		Set<String> allow = super.getAllowedMethods();
-		allow.add("PATCH");
-	    return allow;
 	}
 
 	public Model performTasks(Model consumable) 
