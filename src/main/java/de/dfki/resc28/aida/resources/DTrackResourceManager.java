@@ -39,6 +39,10 @@ public class DTrackResourceManager extends ResourceManager
 		{
 			return new TargetContainer(resourceURI, fGraphStore);
 		}
+		else if (r.hasProperty(RDF.type, ART.TreeTarget))
+		{
+			return new TreeTarget(resourceURI, fGraphStore);
+		}
 		else
 		{
 			return null;

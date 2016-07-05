@@ -1,42 +1,73 @@
 @prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
 @prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix SPATIAL: <http://vocab.arvida.de/ns/spatial#>  .
 @prefix dct:   <http://purl.org/dc/terms/1.1/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sp:    <http://spinrdf.org/sp#> .
+@prefix http: <http://www.w3.org/2011/http#> .
+@prefix http-methods: <http://www.w3.org/2011/http-methods#> .
+@prefix http-headers: <http://www.w3.org/2011/http-headers#> .
+@prefix http-codes: <http://www.w3.org/2011/http-statusCodes#> .
 @base <http://localhost:8080/>
 
 <api/actions/startMeasurement>
   rdf:type ART:StartMeasurementAction , actn:NonSafe , actn:Idempotent ;
   dct:description  "Allows to start measurements using the DTrack2 Controller" ;
-  actn:binding     []  ;
+  actn:binding [
+    rdf:type actn:Binding, http:Request ;
+  	http:httpVersion "1.1" ;
+  	http:mthd http-methods:POST ;
+  	http:requestURI <api/actions/startMeasurement> ;
+    http:headers [ http:hdrNme http-headers:accept ; http:fieldValue "text/turtle" ] ;
+  ] ;
   actn:consumes [
     rdf:type sp:Ask ;
     sp:where  () 
   ] ;
   actn:produces [
-    sp:text "ASK { dtrack:api ART:deviceState ART:Started ; actn:action actions:stopMeasurement , actions:listBodies . FILTER NOT EXISTS { dtrack:api actn:action [ rdf:type actions:ConfigurationAction ] , [ rdf:type actions:StartMeasurementAction ] . } }" ;
+    sp:text '''PREFIX dtrack: <http://localhost:8080/>
+    		   PREFIX actions: <http://localhost:8080/api/actions/>
+    		   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
+    		   PREFIX ART: <http://www.ar-tracking.com/ns#>
+    		   PREFIX SPATIAL: <http://vocab.arvida.de/ns/spatial#>
+    		   ASK {
+    		     dtrack:api ART:deviceState ART:Started ;
+    		     SPATIAL:coordinateSystem   <http://localhost:8080/api/coordinateSystems> ;
+    		     SPATIAL:spatialRelationship  <http://localhost:8080/api/targets> ;
+    		     actn:action actions:stopMeasurement .
+    		     FILTER NOT EXISTS { dtrack:api actn:action actions:tearDown , actions:startMeasurement . } }''' ; 
     rdf:type sp:Ask ;
-    sp:where (
-      [ sp:object ART:DTrack2 ;
-        sp:predicate rdf:type ;
-        sp:subject <api> ]
-      [ sp:object ART:Started ;
-        sp:predicate  ART:deviceState ;
-        sp:subject <api> ]
-      [ sp:object     <api/actions/stopMeasurement> ;
-        sp:predicate  actn:action ;
-        sp:subject <api> ]
-      [ a sp:Filter ;
-        sp:expression  [ 
-          rdf:type sp:notExists ;
-          sp:elements (
-            [ sp:object <api/actions/startMeasurement> ;
-              sp:predicate  actn:action ;
-              sp:subject <api> ]
-          )
-        ]
-      ]
-    )
+    sp:where  ( [ sp:object     ART:Started ;
+                      sp:predicate  ART:deviceState ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     <api/coordinateSystems> ;
+                      sp:predicate  SPATIAL:coordinateSystem ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     <api/targets> ;
+                      sp:predicate  SPATIAL:spatialRelationship ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     <api/actions/stopMeasurement> ;
+                      sp:predicate  actn:action ;
+                      sp:subject    <api>
+                    ]
+                    [ a              sp:Filter ;
+                      sp:expression  [ a            sp:notExists ;
+                                       sp:elements  ( [ sp:object     <api/actions/tearDown> ;
+                                                        sp:predicate  actn:action ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     <api/actions/startMeasurement> ;
+                                                        sp:predicate  actn:action ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                    )
+                                     ]
+                    ]
+                  )
+
   ] .

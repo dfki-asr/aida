@@ -39,24 +39,25 @@ public class StartMeasurementAction extends Action implements IAction
 
 	public Model performTasks(Model consumable) 
 	{
-		Model currentState = fGraphStore.getDefaultGraph();
-		Resource tracker = currentState.listSubjectsWithProperty(RDF.type, ART.DTrack2).next().asResource();
-		
 		DTrackSDK.getInstance().startMeasurement();
+		
+		Model currentState = fGraphStore.getDefaultGraph();
+		currentState.setNsPrefixes(SPATIAL.NAMESPACE);
+		
+		Resource tracker = currentState.listSubjectsWithProperty(RDF.type, ART.DTrack2).next().asResource();
 		
 		// create containers for targets and coordinateSystems
 		Model targetContainerModel = ModelFactory.createDefaultModel();
 		Resource targetContainer = targetContainerModel.createResource("http://localhost:8080/api/targets");
 		targetContainerModel.add(targetContainer, RDF.type, ART.TargetContainer);
+		currentState.add(tracker, SPATIAL.spatialRelationship, targetContainer);
 		fGraphStore.createNamedGraph(targetContainer.getURI().toString(), targetContainerModel);
 
 		Model coordinateSystemContainerModel = ModelFactory.createDefaultModel();
 		Resource coordinateSystemContainer = coordinateSystemContainerModel.createResource("http://localhost:8080/api/coordinateSystems");
 		coordinateSystemContainerModel.add(coordinateSystemContainer, RDF.type, ART.CoordinateSystemContainer);
-		fGraphStore.createNamedGraph(coordinateSystemContainer.getURI().toString(), coordinateSystemContainerModel);	
-			
-		currentState.add(tracker, SPATIAL.spatialRelationship, targetContainer);
 		currentState.add(tracker, SPATIAL.coordinateSystem, coordinateSystemContainer);
+		fGraphStore.createNamedGraph(coordinateSystemContainer.getURI().toString(), coordinateSystemContainerModel);	
 		
 		return currentState;
 	}

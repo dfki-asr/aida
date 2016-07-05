@@ -5,18 +5,78 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sp:    <http://spinrdf.org/sp#> .
+@prefix http: <http://www.w3.org/2011/http#> .
+@prefix http-methods: <http://www.w3.org/2011/http-methods#> .
+@prefix http-headers: <http://www.w3.org/2011/http-headers#> .
+@prefix http-codes: <http://www.w3.org/2011/http-statusCodes#> .
 @base <http://localhost:8080/>
 
 <api/actions/tearDown>
   rdf:type ART:TearDownAction , actn:NonSafe , actn:Idempotent ;
   dct:description  "Allows to tear down the DTrack2 Controller" ;
-  actn:binding     []  ;
+  actn:binding [
+    rdf:type actn:Binding, http:Request ;
+  	http:httpVersion "1.1" ;
+  	http:mthd http-methods:POST ;
+  	http:requestURI <api/actions/tearDown> ;
+    http:headers [ http:hdrNme http-headers:accept ; http:fieldValue "text/turtle" ] ;
+  ] ;
   actn:consumes [
     rdf:type sp:Ask ;
     sp:where  () 
   ] ;
   actn:produces [
-    sp:text "ASK { dtrack:api ART:deviceState ART:Started ; actn:action actions:stopMeasurement , actions:listBodies . FILTER NOT EXISTS { dtrack:api actn:action [ rdf:type actions:ConfigurationAction ] , [ rdf:type actions:StartMeasurementAction ] . } }" ;
+	sp:text '''PREFIX dtrack: <http://localhost:8080/>
+			   PREFIX actions: <http://localhost:8080/api/actions/>
+			   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
+			   PREFIX ART: <http://www.ar-tracking.com/ns#>
+			   PREFIX SPATIAL: <http://vocab.arvida.de/ns/spatial#>
+			   ASK {
+			     dtrack:api ART:deviceState ART:Unconfigured ;
+			     			actn:action actions:configure .
+			     FILTER NOT EXISTS {
+			       dtrack:api actn:action actions:startMeasurement , actions:tearDown ;
+			       			  ART:serverHost _:s ; 
+			       			  ART:serverPort _:p ; 
+			       			  ART:dataPort _:d ; 
+			       			  ART:deviceState ART:Configured . } }''' ;
     rdf:type sp:Ask ;
-    sp:where ()
+    sp:where  ( [ sp:object     ART:Unconfigured ;
+                      sp:predicate  ART:deviceState ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     <api/actions/configure> ;
+                      sp:predicate  actn:action ;
+                      sp:subject    <api>
+                    ]
+                    [ a              sp:Filter ;
+                      sp:expression  [ a            sp:notExists ;
+                                       sp:elements  ( [ sp:object     <api/actions/startMeasurement> ;
+                                                        sp:predicate  actn:action ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     <api/actions/tearDown> ;
+                                                        sp:predicate  actn:action ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     [ sp:varName  "?0" ] ;
+                                                        sp:predicate  ART:serverHost ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     [ sp:varName  "?1" ] ;
+                                                        sp:predicate  ART:serverPort ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     [ sp:varName  "?2" ] ;
+                                                        sp:predicate  ART:dataPort ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     ART:Configured ;
+                                                        sp:predicate  ART:deviceState ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                    )
+                                     ]
+                    ]
+                  )
   ] .

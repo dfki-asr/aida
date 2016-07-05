@@ -19,6 +19,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
 
 import de.dfki.resc28.aida.vocabularies.ART;
 import de.dfki.resc28.aida.vocabularies.LDP;
@@ -31,7 +32,8 @@ import de.dfki.resc28.flapjack.resources.Container;
 import de.dfki.resc28.flapjack.resources.IResource;
 import de.dfki.resc28.igraphstore.IGraphStore;
 
-public class TargetContainer extends Container implements IResource {
+public class TargetContainer extends Container implements IResource 
+{
 
 	public TargetContainer(String resourceURI, IGraphStore graphStore) 
 	{
@@ -50,86 +52,43 @@ public class TargetContainer extends Container implements IResource {
 	public Response read(final String contentType)
 	{
 		DTrackSDK tracker = DTrackSDK.getInstance();
-
 		
 		while (!tracker.receive())
 			System.out.println("Waiting for data frames!");
 		
-		final Model bodyContainerModel =  ModelFactory.createDefaultModel();
-		bodyContainerModel.setNsPrefixes(ART.NAMESPACE);
-		bodyContainerModel.setNsPrefixes(SPATIAL.NAMESPACE);
-		bodyContainerModel.setNsPrefixes(VOM.NAMESPACE);
-		bodyContainerModel.setNsPrefixes(MATHS.NAMESPACE);
-		bodyContainerModel.setNsPrefixes(LDP.NAMESPACE);		
+		final Model targetContainerModel =  ModelFactory.createDefaultModel();
+		targetContainerModel.setNsPrefixes(ART.NAMESPACE);
+		targetContainerModel.setNsPrefixes(LDP.NAMESPACE);
 		
-		Resource bodyContainer = bodyContainerModel.createResource(fURI);
-		bodyContainerModel.add(bodyContainer, RDF.type, LDP.Container);
-		bodyContainerModel.add(bodyContainer, LDP.hasMemberRelation, SPATIAL.coordinateSystem);
+		
+		Resource targetContainer = targetContainerModel.createResource(fURI);
+		targetContainerModel.add(targetContainer, RDF.type, LDP.Container);
+
 		
 		for (int i=0; i< tracker.getNumBody(); i++)
 		{
 			Body artBody = tracker.getBody(i);
-			
+
 			Model bodyModel = ModelFactory.createDefaultModel();
-			
 			bodyModel.setNsPrefixes(ART.NAMESPACE);
 			bodyModel.setNsPrefixes(SPATIAL.NAMESPACE);
 			bodyModel.setNsPrefixes(VOM.NAMESPACE);
 			bodyModel.setNsPrefixes(MATHS.NAMESPACE);
-			
-			Resource body = bodyModel.createResource(fURI + "/" + i);
-			Resource sr = bodyModel.createResource();
-			Resource sourceCS = bodyModel.createResource();
-			Resource targetCS = bodyModel.createResource();
-			Resource translation = bodyModel.createResource();
-			Resource vec3 = bodyModel.createResource();
-			Resource rotation = bodyModel.createResource();
-			Resource mat3 = bodyModel.createResource();
-			
-			bodyModel.add(sourceCS, RDF.type, MATHS.CoordinateSystem);
-			bodyModel.add(targetCS, RDF.type, MATHS.CoordinateSystem);
-			
-			bodyModel.add(body, RDF.type, ART.Target);
-			bodyModel.add(body, SPATIAL.spatialRelationship, sr);
-			
-			bodyModel.add(sr, RDF.type,  SPATIAL.SpatialRelationship);
-			bodyModel.add(sr, SPATIAL.sourceCoordinateSystem, sourceCS);
-			bodyModel.add(sr, SPATIAL.targetCoordinateSystem, targetCS);
-			bodyModel.add(sr, SPATIAL.translation, translation);
-			bodyModel.add(sr, SPATIAL.rotation, rotation);
-			
-			bodyModel.add(translation, RDF.type, SPATIAL.Translation3D);
-			bodyModel.add(translation, VOM.quantityValue, vec3);
-	
-			bodyModel.add(vec3, RDF.type, MATHS.Vector3D);
-			bodyModel.add(vec3, MATHS.x, bodyModel.createTypedLiteral(artBody.getLocation()[0]));
-			bodyModel.add(vec3, MATHS.y, bodyModel.createTypedLiteral(artBody.getLocation()[1]));
-			bodyModel.add(vec3, MATHS.z, bodyModel.createTypedLiteral(artBody.getLocation()[2]));
-			
-			bodyModel.add(rotation, RDF.type, SPATIAL.Rotation3D);
-			bodyModel.add(rotation, VOM.quantityValue, mat3);
-			
-			bodyModel.add(mat3, RDF.type, MATHS.Matrix3D);
-			bodyModel.add(mat3, MATHS.a11, bodyModel.createTypedLiteral(artBody.getRotation()[0]));
-			bodyModel.add(mat3, MATHS.a12, bodyModel.createTypedLiteral(artBody.getRotation()[1]));
-			bodyModel.add(mat3, MATHS.a13, bodyModel.createTypedLiteral(artBody.getRotation()[2]));
-			bodyModel.add(mat3, MATHS.a21, bodyModel.createTypedLiteral(artBody.getRotation()[3]));
-			bodyModel.add(mat3, MATHS.a22, bodyModel.createTypedLiteral(artBody.getRotation()[4]));
-			bodyModel.add(mat3, MATHS.a23, bodyModel.createTypedLiteral(artBody.getRotation()[5]));
-			bodyModel.add(mat3, MATHS.a31, bodyModel.createTypedLiteral(artBody.getRotation()[6]));
-			bodyModel.add(mat3, MATHS.a32, bodyModel.createTypedLiteral(artBody.getRotation()[7]));
-			bodyModel.add(mat3, MATHS.a33, bodyModel.createTypedLiteral(artBody.getRotation()[8]));
+			bodyModel.setNsPrefix("xsd", XSD.NS);
+			Resource body = bodyModel.createResource(fURI + "/" + artBody.getID());
+			bodyModel.add(body, RDF.type, ART.TreeTarget);
+			bodyModel.add(body, ART.bodyID, bodyModel.createTypedLiteral(artBody.getID()));
+			fGraphStore.createNamedGraph(body.getURI().toString(), bodyModel);
 
-					
-			bodyContainerModel.add(bodyContainer, LDP.contains, sr);
-			bodyContainerModel.add(bodyModel);
+			targetContainerModel.add(targetContainer, LDP.contains, body);
+			targetContainerModel.add(body, RDF.type, ART.TreeTarget);
 		}
 			
 		StreamingOutput out = new StreamingOutput() 
 		{
 			public void write(OutputStream output) throws IOException, WebApplicationException
 			{
-				RDFDataMgr.write(output, bodyContainerModel, RDFDataMgr.determineLang(null, contentType, null)) ;
+				RDFDataMgr.write(output, targetContainerModel, RDFDataMgr.determineLang(null, contentType, null)) ;
 			}
 		};
 		

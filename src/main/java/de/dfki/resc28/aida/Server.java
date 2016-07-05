@@ -11,8 +11,6 @@ import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -20,7 +18,6 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 import de.dfki.resc28.aida.services.DTrackActionProvider;
-import de.dfki.resc28.aida.services.DTrackService;
 import de.dfki.resc28.igraphstore.jena.FusekiGraphStore;
 
 
@@ -40,9 +37,8 @@ public class Server extends Application
     {
 		initGraphStore();
 		
-		DTrackActionProvider foo = new DTrackActionProvider(new FusekiGraphStore(dataEndpoint, queryEndpoint));
-		DTrackService bar = new DTrackService(new FusekiGraphStore(dataEndpoint, queryEndpoint));
-        return new HashSet<Object>(Arrays.asList(foo, bar));
+		DTrackActionProvider bla = new DTrackActionProvider(new FusekiGraphStore(dataEndpoint, queryEndpoint));
+		return new HashSet<Object>(Arrays.asList(bla));
     }
 	
 	public void initGraphStore()
@@ -70,6 +66,10 @@ public class Server extends Application
 		Model stopMeasurementAction = ModelFactory.createDefaultModel(); 
 		RDFDataMgr.read(stopMeasurementAction, getClass().getClassLoader().getResourceAsStream("stopMeasurement.ttl"), Lang.TURTLE);
 		fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/stopMeasurement", stopMeasurementAction);
+		
+		Model tearDownAction = ModelFactory.createDefaultModel(); 
+		RDFDataMgr.read(tearDownAction, getClass().getClassLoader().getResourceAsStream("tearDown.ttl"), Lang.TURTLE);
+		fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/tearDown", tearDownAction);
 	}
 
 }

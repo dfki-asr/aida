@@ -5,55 +5,105 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sp:    <http://spinrdf.org/sp#> .
+@prefix http: <http://www.w3.org/2011/http#> .
+@prefix http-methods: <http://www.w3.org/2011/http-methods#> .
+@prefix http-headers: <http://www.w3.org/2011/http-headers#> .
+@prefix http-codes: <http://www.w3.org/2011/http-statusCodes#> .
 @base <http://localhost:8080/> .
 
 <api/actions/configure>
   rdf:type ART:ConfigurationAction , actn:NonSafe , actn:Idempotent ;
   dct:description  "Allows to configure the DTrack2 Controller" ;
-  actn:binding []  ;
+  actn:binding [
+    rdf:type actn:Binding, http:Request ;
+  	http:httpVersion "1.1" ;
+  	http:mthd http-methods:PATCH ;
+  	http:requestURI <api/actions/configure> ;
+    http:headers [ http:hdrNme http-headers:accept ; http:fieldValue "text/turtle" ] , [ http:hdrNme http-headers:content-type ; http:fieldValue "text/turtle" ] ;
+  ]  ;
   actn:consumes [
-    sp:text "ASK { dtrack:api ART:serverHost ?host ; ART:serverPort ?hostPort ; ART:dataPort ?clientPort . }" ; 
+    sp:text '''PREFIX ART: <http://www.ar-tracking.com/ns#> 
+    		   PREFIX dtrack: <http://localhost:8080/> 
+    		   ASK { 
+    		     dtrack:api ART:serverHost ?host ; 
+    		     			ART:serverPort ?hostPort ; 
+    		     			ART:dataPort ?clientPort . }''' ; 
     rdf:type sp:Ask ;
     sp:where (
-      [ sp:object [ sp:varName  "host" ] ;
+      [ sp:object _:host ;
         sp:predicate ART:serverHost ;
         sp:subject <api> ]
-      [ sp:object [ sp:varName  "hostPort" ] ;
+      [ sp:object _:hostPort ;
         sp:predicate ART:serverPort ;
         sp:subject <api> ]
-      [ sp:object [ sp:varName  "clientPort" ] ;
+      [ sp:object _:clientPort ;
         sp:predicate ART:dataPort ;
         sp:subject <api> ]
     )
   ] ;
   actn:produces [
-    sp:text "ASK WHERE { dtrack:api ART:deviceState 'configured' . dtrack:api actn:action [ a ART:StartMeasurementAction ] . FILTER NOT EXISTS { dtrack:api ART:deviceState 'unconfigured' ; actn:action [ rdf:type ART:ConfigurationAction ] } }" ;
+    sp:text '''PREFIX ART: <http://www.ar-tracking.com/ns#>
+    		   PREFIX dtrack: <http://localhost:8080/>
+    		   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
+    		   ASK {
+    		     dtrack:api ART:deviceState ART:Configured ;
+    		     			ART:serverHost ?host ;
+    		     			ART:serverPort ?hostPort ;
+    		     			ART:dataPort ?clientPort ;
+    		     			actn:action <http://localhost:8080/actions/startMeasurement> , <http://localhost:8080/actions/tearDown> .
+    		     			FILTER NOT EXISTS {
+    		     			  dtrack:api ART:deviceState ART:Unconfigured ;
+    		     			  			 actn:action <http://localhost:8080/actions/configure> . } }''' ;
     rdf:type sp:Ask ;
-    sp:where (
-      [ sp:object ART:Configured ;
-        sp:predicate ART:deviceState ;
-        sp:subject <api> ]
-      [ sp:object [ sp:varName  "?0" ] ;
-        sp:predicate actn:action ;
-        sp:subject <api> ]
-      [ sp:object ART:StartMeasurementAction ;
-        sp:predicate  rdf:type ;
-        sp:subject [ sp:varName  "?0" ] ]
-      [ a sp:Filter ;
-        sp:expression [ 
-          rdf:type sp:notExists ;
-          sp:elements (
-            [ sp:object ART:Unconfigured ;
-              sp:predicate  ART:deviceState ;
-              sp:subject <api> ]
-            [ sp:object [ sp:varName  "?1" ] ;
-              sp:predicate  actn:action ;
-              sp:subject <api> ]
-            [ sp:object     ART:ConfigurationAction ;
-              sp:predicate  rdf:type ;
-              sp:subject    [ sp:varName  "?1" ] ]
-          )
-        ]
-      ]
-    )
+	sp:where  ( [ sp:object     ART:Configured ;
+                      sp:predicate  ART:deviceState ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     _:host ;
+                      sp:predicate  ART:serverHost ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     _:hostPort ;
+                      sp:predicate  ART:serverPort ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     _:clientPort ;
+                      sp:predicate  ART:dataPort ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     <api/actions/startMeasurement> ;
+                      sp:predicate  actn:action ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     <api/actions/tearDown> ;
+                      sp:predicate  actn:action ;
+                      sp:subject    <api>
+                    ]
+                    [ a              sp:Filter ;
+                      sp:expression  [ a            sp:notExists ;
+                                       sp:elements  ( [ sp:object     ART:Unconfigured ;
+                                                        sp:predicate  ART:deviceState ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     <api/actions/configure> ;
+                                                        sp:predicate  actn:action ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                    )
+                                     ]
+                    ]
+                  )
   ] .
+
+_:host
+  rdf:type sp:Variable ;
+  sp:varName  "host" .
+  
+_:hostPort
+  rdf:type sp:Variable ;
+  sp:varName  "hostPort" .
+
+_:clientPort
+  rdf:type sp:Variable ;
+  sp:varName  "clientPort" .
+[ sp:varName  "host" ]
