@@ -9,7 +9,7 @@ Transitions are labeled with *actions*.
 An action is an action possibility (or affordance) that AIDA may afford to a client. 
 Such affordances describe an end and some means to accomplish that end, e.g. via HTTP-based interaction pattern(s). 
 
-AIDA depends on [art4j](https://github.com/rmrschub/flapjack), [fLAPjACk](https://github.com/rmrschub/flapjack) and on [Sodalite](https://github.com/rmrschub/sodalite).
+AIDA depends on [art4j](https://github.com/rmrschub/art4j), [fLAPjACk](https://github.com/rmrschub/flapjack) and on [Sodalite](https://github.com/rmrschub/sodalite).
 
 
 ## Setup 
