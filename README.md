@@ -216,7 +216,7 @@ E.g., simply perform a `GET` against `http://localhost:8080/api/actions/startMea
                            sp:where  ( _:b1 _:b2 _:b3 _:b0 _:b4 )
                          ] .
 ```
-This tells your Linked Data agent, *what* will happen when executing `http://localhost:8080/api/actions/startMeasurement`, and of course how to this affordance. 
+This tells your Linked Data agent, *what* will happen when executing `http://localhost:8080/api/actions/startMeasurement`, and *how* to this affordance. 
 
 ## Contributing
 Contributions are very welcome.
