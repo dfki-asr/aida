@@ -151,6 +151,72 @@ _:b2    a            lts:Simple ;
         lts:stateIndicator  ART:deviceState .
 ```
 
+You can configure AIDA by `PATCH`ing something like this against `http://localhost:8080/api/actions/configure`
+```
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dtrack: <http://localhost:8080/> .
+
+dtrack:api
+  ART:serverHost "192.168.81.110"^^xsd:string ;
+  ART:serverPort "50105"^^xsd:int ;
+  ART:dataPort "5000"^^xsd:int .
+```
+
+Once configured, AIDA will provide more affordances 
+```
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix lts:   <http://www.dfki.de/resc01/ns/lts#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://localhost:8080/api>
+        a                actn:ActionableResource , ART:DTrack2 ;
+        dct:description  "Linked API for DTrack2 Controller" ;
+        ART:dataPort     "5000"^^xsd:int ;
+        ART:deviceState  ART:Configured ;
+        ART:serverHost   "192.168.81.110" ;
+        ART:serverPort   "50105"^^xsd:int ;
+        actn:action      <http://localhost:8080/api/actions/tearDown> , <http://localhost:8080/api/actions/startMeasurement> ;
+        lts:model        <http://localhost:8080/api/model> .
+```
+
+For each of AIDA's affordances, you can always explore the required HTTP methods and RDF data AIDA will consume.
+E.g., simply perform a `GET` against `http://localhost:8080/api/actions/startMeasurement`
+```
+<http://localhost:8080/api/actions/startMeasurement>
+        a                ART:StartMeasurementAction , actn:Idempotent , actn:NonSafe ;
+        dct:description  "Allows to start measurements using the DTrack2 Controller" ;
+        actn:binding     [ a                 http:Request , actn:Binding ;
+                           http:headers      [ http:fieldValue  "text/turtle" ;
+                                               http:hdrNme      http-headers:accept
+                                             ] ;
+                           http:httpVersion  "1.1" ;
+                           http:mthd         http-methods:POST ;
+                           http:requestURI   <http://localhost:8080/api/actions/startMeasurement>
+                         ] ;
+        actn:consumes    [ dct:description "No input required!"
+                           a         sp:Ask ;
+                           sp:where  ()
+                         ] ;
+        actn:produces    [ a         sp:Ask ;
+                           sp:text   "PREFIX dtrack: <http://localhost:8080/>
+                                      PREFIX actions: <http://localhost:8080/api/actions/>
+                                      ...
+                                      ASK {
+                                        dtrack:api ART:deviceState ART:Started ;
+                                        SPATIAL:coordinateSystem   <http://localhost:8080/api/coordinateSystems> ;
+                                        SPATIAL:spatialRelationship  <http://localhost:8080/api/targets> ;
+                                        actn:action actions:stopMeasurement .
+                                        FILTER NOT EXISTS { dtrack:api actn:action actions:tearDown , actions:startMeasurement . } }" ;                            
+                           sp:where  ( _:b1 _:b2 _:b3 _:b0 _:b4 )
+                         ] .
+```
+This tells your Linked Data agent, *what* will happen when executing `http://localhost:8080/api/actions/startMeasurement`, and of course how to this affordance. 
 
 ## Contributing
 Contributions are very welcome.
