@@ -7,6 +7,7 @@ package de.dfki.resc28.aida;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
@@ -18,7 +19,9 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 import de.dfki.resc28.aida.services.DTrackActionProvider;
+import de.dfki.resc28.igraphstore.IGraphStore;
 import de.dfki.resc28.igraphstore.jena.FusekiGraphStore;
+import de.dfki.resc28.igraphstore.jena.TDBGraphStore;
 
 
 /**
@@ -28,48 +31,72 @@ import de.dfki.resc28.igraphstore.jena.FusekiGraphStore;
 @ApplicationPath("/")
 public class Server extends Application 
 {
-	public static String dataEndpoint = "http://localhost:3030/ART/data";
-	public static String queryEndpoint = "http://localhost:3030/ART/sparql";
-	
+	public static IGraphStore fGraphStore;
 	
 	@Override
     public Set<Object> getSingletons() 
     {
+		configure();
 		initGraphStore();
-		
-		DTrackActionProvider bla = new DTrackActionProvider(new FusekiGraphStore(dataEndpoint, queryEndpoint));
+		DTrackActionProvider bla = new DTrackActionProvider(fGraphStore);
 		return new HashSet<Object>(Arrays.asList(bla));
     }
 	
+	public void configure()
+	{
+		try
+		{
+			java.io.InputStream is = Server.class.getClassLoader().getResourceAsStream("aida.properties");
+			java.util.Properties p = new Properties();
+			p.load(is);
+		
+			String storage = p.getProperty("graphStore");
+			
+			if (storage.equals("fuseki"))
+			{
+				Server.fGraphStore = new FusekiGraphStore(p.getProperty("dataEndpoint"), p.getProperty("queryEndpoint"));
+			}
+			else if (storage.equals("tdb"))
+			{
+				if (p.containsKey("datasetDir"))
+					Server.fGraphStore = new TDBGraphStore(p.getProperty("datasetDir"));
+				else
+					Server.fGraphStore = new TDBGraphStore();
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void initGraphStore()
 	{
-		FusekiGraphStore fGraphStore = new FusekiGraphStore(dataEndpoint, queryEndpoint);
-		fGraphStore.clearDefaultGraph();
+		Server.fGraphStore.clearDefaultGraph();
 		
 		Model machineModel = ModelFactory.createDefaultModel();
 		RDFDataMgr.read(machineModel, getClass().getClassLoader().getResourceAsStream("model.ttl"), Lang.TURTLE);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api/model", machineModel);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api/model", machineModel);
 		
 		Model initialState = ModelFactory.createDefaultModel();
 		RDFDataMgr.read(initialState, getClass().getClassLoader().getResourceAsStream("init.ttl"), Lang.TURTLE);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api/model/initial", initialState);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api", initialState);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api/model/initial", initialState);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api", initialState);
 		
 		Model configureAction = ModelFactory.createDefaultModel(); 
 		RDFDataMgr.read(configureAction, getClass().getClassLoader().getResourceAsStream("configure.ttl"), Lang.TURTLE);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/configure", configureAction);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/configure", configureAction);
 		
 		Model startMeasurementAction = ModelFactory.createDefaultModel(); 
 		RDFDataMgr.read(startMeasurementAction, getClass().getClassLoader().getResourceAsStream("startMeasurement.ttl"), Lang.TURTLE);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/startMeasurement", startMeasurementAction);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/startMeasurement", startMeasurementAction);
 		
 		Model stopMeasurementAction = ModelFactory.createDefaultModel(); 
 		RDFDataMgr.read(stopMeasurementAction, getClass().getClassLoader().getResourceAsStream("stopMeasurement.ttl"), Lang.TURTLE);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/stopMeasurement", stopMeasurementAction);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/stopMeasurement", stopMeasurementAction);
 		
 		Model tearDownAction = ModelFactory.createDefaultModel(); 
 		RDFDataMgr.read(tearDownAction, getClass().getClassLoader().getResourceAsStream("tearDown.ttl"), Lang.TURTLE);
-		fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/tearDown", tearDownAction);
+		Server.fGraphStore.replaceNamedGraph("http://localhost:8080/api/actions/tearDown", tearDownAction);
 	}
-
 }
