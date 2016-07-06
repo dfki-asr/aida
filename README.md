@@ -83,9 +83,18 @@ mvn clean package tomcat7:run
 
 ## Usage
 Get AIDA up and running. Then, use your favourite REST client against one of our REST APIs.
+Don't forget to set `Content-Type` and `Accept` headers to one of the following:
 
-### HTML UI (work in progress)
-Point your good ol' browser to `http://localhost:8080` for some self-explanatory HTML UI.
+* text/turtle
+* text/n3 
+* * text/trig 
+* application/x-turtle
+* application/ld+json 
+* application/n-quads 
+* application/n-triples 
+* application/rdf+json 
+* application/rdf+xml 
+* application/trix
 
 ### Linked API
 Point your Linked Data client to `http://localhost:8080/api` and `GET` some RDF like this
@@ -217,6 +226,233 @@ E.g., simply perform a `GET` against `http://localhost:8080/api/actions/startMea
                          ] .
 ```
 This tells your Linked Data agent, *what* will happen when executing `http://localhost:8080/api/actions/startMeasurement`, and *how* to this affordance. 
+
+Once started, a `GET` on `http://localhost:8080/api` gives you 
+```
+@prefix SPATIAL: <http://vocab.arvida.de/ns/spatial#> .
+@prefix actn:  <http://www.dfki.de/resc01/ns/actions#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/1.1/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix lts:   <http://www.dfki.de/resc01/ns/lts#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://localhost:8080/api>
+        a                            actn:ActionableResource , ART:DTrack2 ;
+        dct:description              "Linked API for DTrack2 Controller" ;
+        SPATIAL:coordinateSystem     <http://localhost:8080/api/coordinateSystems> ;
+        SPATIAL:spatialRelationship  <http://localhost:8080/api/targets> ;
+        ART:dataPort                 "5000"^^xsd:int ;
+        ART:deviceState              ART:Started ;
+        ART:serverHost               "192.168.81.110" ;
+        ART:serverPort               "50105"^^xsd:int ;
+        actn:action                  <http://localhost:8080/api/actions/stopMeasurement> ;
+        lts:model                    <http://localhost:8080/api/model> .
+```
+
+and allows to `GET` all tracked targets from `http://localhost:8080/api/targets`
+```
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix LDP:   <http://www.w3.org/ns/ldp#> .
+
+<http://localhost:8080/api/targets>
+        a             LDP:Container ;
+        LDP:contains  <http://localhost:8080/api/targets/0> , 
+        	      <http://localhost:8080/api/targets/1> , 
+        	      <http://localhost:8080/api/targets/2> .
+```
+
+Choose your favourite target and `GET` its tracking data from `http://localhost:8080/api/targets/0`
+```
+@prefix SPATIAL: <http://vocab.arvida.de/ns/spatial#> .
+@prefix MATHS: <http://vocab.arvida.de/ns/maths#> .
+@prefix ART:   <http://www.ar-tracking.com/ns#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix VOM:   <http://vocab.arvida.de/ns/vom#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://localhost:8080/api/targets/0>
+        a                            ART:Target , ART:TreeTarget ;
+        SPATIAL:spatialRelationship  [ a                               SPATIAL:SpatialRelationship ;
+                                       SPATIAL:rotation                [ a                  SPATIAL:Rotation3D ;
+                                                                         VOM:quantityValue  [ a          MATHS:Matrix3D ;
+                                                                                              MATHS:a11  "0.554293"^^xsd:double ;
+                                                                                              MATHS:a12  "-0.831728"^^xsd:double ;
+                                                                                              MATHS:a13  "0.031426"^^xsd:double ;
+                                                                                              MATHS:a21  "0.616607"^^xsd:double ;
+                                                                                              MATHS:a22  "0.435704"^^xsd:double ;
+                                                                                              MATHS:a23  "0.655712"^^xsd:double ;
+                                                                                              MATHS:a31  "-0.559067"^^xsd:double ;
+                                                                                              MATHS:a32  "-0.344079"^^xsd:double ;
+                                                                                              MATHS:a33  "0.754357"^^xsd:double
+                                                                                            ]
+                                                                       ] ;
+                                       SPATIAL:sourceCoordinateSystem  [ a  MATHS:CoordinateSystem ] ;
+                                       SPATIAL:targetCoordinateSystem  [ a  MATHS:CoordinateSystem ] ;
+                                       SPATIAL:translation             [ a                  SPATIAL:Translation3D ;
+                                                                         VOM:quantityValue  [ a        MATHS:Vector3D ;
+                                                                                              MATHS:x  "165.987"^^xsd:double ;
+                                                                                              MATHS:y  "318.763"^^xsd:double ;
+                                                                                              MATHS:z  "-15.187"^^xsd:double
+                                                                                            ]
+                                                                       ]
+                                     ] ;
+        ART:bodyID                   "0"^^xsd:int .
+```
+
+By setting your client's `Accept` header to, let's say, `application/ld+json`, you get your tracking data in JSON:
+```
+{
+    "@graph": [
+        {
+            "@id": "_:b0",
+            "@type": "SPATIAL:SpatialRelationship",
+            "rotation": "_:b1",
+            "sourceCoordinateSystem": "_:b4",
+            "targetCoordinateSystem": "_:b3",
+            "translation": "_:b2"
+        },
+        {
+            "@id": "_:b1",
+            "@type": "SPATIAL:Rotation3D",
+            "quantityValue": "_:b5"
+        },
+        {
+            "@id": "_:b2",
+            "@type": "SPATIAL:Translation3D",
+            "quantityValue": "_:b6"
+        },
+        {
+            "@id": "_:b3",
+            "@type": "MATHS:CoordinateSystem"
+        },
+        {
+            "@id": "_:b4",
+            "@type": "MATHS:CoordinateSystem"
+        },
+        {
+            "@id": "_:b5",
+            "@type": "MATHS:Matrix3D",
+            "MATHS:a11": 0.554469,
+            "MATHS:a12": -0.831607,
+            "MATHS:a13": 0.03152,
+            "MATHS:a21": 0.616407,
+            "MATHS:a22": 0.435843,
+            "MATHS:a23": 0.655807,
+            "MATHS:a31": -0.559111,
+            "MATHS:a32": -0.344196,
+            "MATHS:a33": 0.75427
+        },
+        {
+            "@id": "_:b6",
+            "@type": "MATHS:Vector3D",
+            "MATHS:x": 166.068,
+            "MATHS:y": 318.686,
+            "MATHS:z": -14.814
+        },
+        {
+            "@id": "http://localhost:8080/api/targets/0",
+            "@type": [
+                "ART:Target",
+                "ART:TreeTarget"
+            ],
+            "spatialRelationship": "_:b0",
+            "bodyID": "0"
+        }
+    ],
+    "@context": {
+        "rotation": {
+            "@id": "http://vocab.arvida.de/ns/spatial#rotation",
+            "@type": "@id"
+        },
+        "translation": {
+            "@id": "http://vocab.arvida.de/ns/spatial#translation",
+            "@type": "@id"
+        },
+        "targetCoordinateSystem": {
+            "@id": "http://vocab.arvida.de/ns/spatial#targetCoordinateSystem",
+            "@type": "@id"
+        },
+        "sourceCoordinateSystem": {
+            "@id": "http://vocab.arvida.de/ns/spatial#sourceCoordinateSystem",
+            "@type": "@id"
+        },
+        "a32": {
+            "@id": "http://vocab.arvida.de/ns/maths#a32",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a33": {
+            "@id": "http://vocab.arvida.de/ns/maths#a33",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a11": {
+            "@id": "http://vocab.arvida.de/ns/maths#a11",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a21": {
+            "@id": "http://vocab.arvida.de/ns/maths#a21",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a31": {
+            "@id": "http://vocab.arvida.de/ns/maths#a31",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a22": {
+            "@id": "http://vocab.arvida.de/ns/maths#a22",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a13": {
+            "@id": "http://vocab.arvida.de/ns/maths#a13",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a23": {
+            "@id": "http://vocab.arvida.de/ns/maths#a23",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "a12": {
+            "@id": "http://vocab.arvida.de/ns/maths#a12",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "z": {
+            "@id": "http://vocab.arvida.de/ns/maths#z",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "y": {
+            "@id": "http://vocab.arvida.de/ns/maths#y",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "x": {
+            "@id": "http://vocab.arvida.de/ns/maths#x",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "spatialRelationship": {
+            "@id": "http://vocab.arvida.de/ns/spatial#spatialRelationship",
+            "@type": "@id"
+        },
+        "bodyID": {
+            "@id": "http://www.ar-tracking.com/ns#bodyID",
+            "@type": "http://www.w3.org/2001/XMLSchema#int"
+        },
+        "quantityValue": {
+            "@id": "http://vocab.arvida.de/ns/vom#quantityValue",
+            "@type": "@id"
+        },
+        "MATHS": "http://vocab.arvida.de/ns/maths#",
+        "SPATIAL": "http://vocab.arvida.de/ns/spatial#",
+        "ART": "http://www.ar-tracking.com/ns#",
+        "VOM": "http://vocab.arvida.de/ns/vom#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
+    }
+}
+```
+
+Happy tracking!
+
+### HTML UI (work in progress)
+Point your good ol' browser to `http://localhost:8080` for some self-explanatory HTML UI.
 
 ## Contributing
 Contributions are very welcome.
