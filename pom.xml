@@ -18,6 +18,7 @@
   		<graphStore>fuseki</graphStore>
     	<dataEndpoint>http://localhost:3030/ART/data</dataEndpoint>
     	<queryEndpoint>http://localhost:3030/ART/sparql</queryEndpoint>
+        <baseURI>http://localhost:8080</baseURI>
 	</properties>
 
 	<build>
