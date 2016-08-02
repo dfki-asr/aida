@@ -46,18 +46,36 @@ public class Server extends Application
 	{
 		try
 		{
-			java.io.InputStream is = Server.class.getClassLoader().getResourceAsStream("aida.properties");
+
+			String aidaConfigFile = System.getProperty("aida.configuration");
+			java.io.InputStream is;
+			if (aidaConfigFile != null)
+			{
+                            is = new java.io.FileInputStream(aidaConfigFile);
+                            System.out.format("Loading AIDA configuration from %s ...%n", aidaConfigFile);
+                        }
+                        else
+                        {
+                            is = Server.class.getClassLoader().getResourceAsStream("aida.properties");
+                            System.out.println("Loading AIDA configuration from internal resource file ...");
+                        }
 			java.util.Properties p = new Properties();
 			p.load(is);
-		
+
 			String storage = p.getProperty("graphStore");
 			
 			if (storage.equals("fuseki"))
 			{
-				Server.fGraphStore = new FusekiGraphStore(p.getProperty("dataEndpoint"), p.getProperty("queryEndpoint"));
+                                String dataEndpoint = p.getProperty("dataEndpoint");
+                                String queryEndpoint = p.getProperty("queryEndpoint");
+                                System.out.format("Use Fuseki backend: dataEndpoint=%s queryEndpoint=%s ...%n", dataEndpoint, queryEndpoint);
+
+				Server.fGraphStore = new FusekiGraphStore(dataEndpoint, queryEndpoint);
 			}
 			else if (storage.equals("tdb"))
 			{
+                                System.out.format("Use TDB backend: datasetDir=%s ...%n", p.getProperty("datasetDir"));
+
 				if (p.containsKey("datasetDir"))
 					Server.fGraphStore = new TDBGraphStore(p.getProperty("datasetDir"));
 				else
