@@ -41,7 +41,7 @@ public class DTrack2 extends Resource implements IResource
 	{
 		final Model description = fGraphStore.getDefaultGraph();
                 final Lang lang = RDFDataMgr.determineLang(null, contentType, null);
-                System.err.format("Content type is %s, lang is %s%n", contentType, lang);
+                System.err.format("AIDA: Content type is %s, lang is %s%n", contentType, lang);
                 if (lang == null) {
                     throw new WebApplicationException("Could not convert content type "+contentType+" to RDF language", Status.BAD_REQUEST);
                 }
