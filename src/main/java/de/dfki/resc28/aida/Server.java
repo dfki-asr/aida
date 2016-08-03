@@ -19,6 +19,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 import de.dfki.resc28.aida.services.DTrackActionProvider;
+import de.dfki.resc28.aida.services.DebugService;
 import de.dfki.resc28.igraphstore.IGraphStore;
 import de.dfki.resc28.igraphstore.jena.FusekiGraphStore;
 import de.dfki.resc28.igraphstore.jena.TDBGraphStore;
@@ -38,7 +39,8 @@ public class Server extends Application
     {
 		configure();
 		DTrackActionProvider bla = new DTrackActionProvider(fGraphStore);
-		return new HashSet<Object>(Arrays.asList(bla));
+                DebugService debugSvc = new DebugService();
+		return new HashSet<Object>(Arrays.asList(bla, debugSvc));
     }
 
 	public static synchronized void configure()
