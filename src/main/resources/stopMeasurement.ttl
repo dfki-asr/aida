@@ -10,7 +10,6 @@
 @prefix http-methods: <http://www.w3.org/2011/http-methods#> .
 @prefix http-headers: <http://www.w3.org/2011/http-headers#> .
 @prefix http-codes: <http://www.w3.org/2011/http-statusCodes#> .
-@base <http://localhost:8080/> .
 
 <api/actions/stopMeasurement>
   a                actn:NonSafe , actn:Idempotent , ART:StopMeasurementAction ;

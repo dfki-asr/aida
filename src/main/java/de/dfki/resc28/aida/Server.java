@@ -106,28 +106,28 @@ public class Server extends Application
 		Server.fGraphStore.clearDefaultGraph();
 
 		Model machineModel = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(machineModel, Server.class.getClassLoader().getResourceAsStream("model.ttl"), Lang.TURTLE);
+		RDFDataMgr.read(machineModel, Server.class.getClassLoader().getResourceAsStream("model.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/model", machineModel);
 
 		Model initialState = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(initialState, Server.class.getClassLoader().getResourceAsStream("init.ttl"), Lang.TURTLE);
+		RDFDataMgr.read(initialState, Server.class.getClassLoader().getResourceAsStream("init.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/model/initial", initialState);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api", initialState);
 
 		Model configureAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(configureAction, Server.class.getClassLoader().getResourceAsStream("configure.ttl"), Lang.TURTLE);
+		RDFDataMgr.read(configureAction, Server.class.getClassLoader().getResourceAsStream("configure.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/configure", configureAction);
 
 		Model startMeasurementAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(startMeasurementAction, Server.class.getClassLoader().getResourceAsStream("startMeasurement.ttl"), Lang.TURTLE);
+		RDFDataMgr.read(startMeasurementAction, Server.class.getClassLoader().getResourceAsStream("startMeasurement.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/startMeasurement", startMeasurementAction);
 
 		Model stopMeasurementAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(stopMeasurementAction, Server.class.getClassLoader().getResourceAsStream("stopMeasurement.ttl"), Lang.TURTLE);
+		RDFDataMgr.read(stopMeasurementAction, Server.class.getClassLoader().getResourceAsStream("stopMeasurement.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/stopMeasurement", stopMeasurementAction);
 
 		Model tearDownAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(tearDownAction, Server.class.getClassLoader().getResourceAsStream("tearDown.ttl"), Lang.TURTLE);
+		RDFDataMgr.read(tearDownAction, Server.class.getClassLoader().getResourceAsStream("tearDown.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/tearDown", tearDownAction);
                 System.out.println("AIDA: Graph Storage Initialized");
 	}
