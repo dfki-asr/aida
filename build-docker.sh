@@ -161,11 +161,11 @@ usage() {
 while [[ $# > 0 ]]; do
     case "$1" in
         --java-deps)
-            JAVA_MAVEN_DEPS=("$2")
+            JAVA_MAVEN_DEPS=($2)
             shift 2
             ;;
         --java-deps=*)
-            JAVA_MAVEN_DEPS=("${1#*=}")
+            JAVA_MAVEN_DEPS=(${1#*=})
             shift
             ;;
         -t|--tag)
