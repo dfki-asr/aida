@@ -21,12 +21,12 @@
     http:headers [ http:hdrNme http-headers:accept ; http:fieldValue "text/turtle" ] , [ http:hdrNme http-headers:content-type ; http:fieldValue "text/turtle" ] ;
   ]  ;
   actn:consumes [
-    sp:text '''PREFIX ART: <http://www.ar-tracking.com/ns#> 
-    		   PREFIX dtrack: <http://localhost:8080/> 
-    		   ASK { 
-    		     dtrack:api ART:serverHost ?host ; 
-    		     			ART:serverPort ?hostPort ; 
-    		     			ART:dataPort ?clientPort . }''' ; 
+    sp:text '''PREFIX ART: <http://www.ar-tracking.com/ns#>
+    		   PREFIX dtrack: <{{ baseURI }}/>
+    		   ASK {
+    		     dtrack:api ART:serverHost ?host ;
+    		     			ART:serverPort ?hostPort ;
+    		     			ART:dataPort ?clientPort . }''' ;
     rdf:type sp:Ask ;
     sp:where (
       [ sp:object _:host ;
@@ -42,17 +42,17 @@
   ] ;
   actn:produces [
     sp:text '''PREFIX ART: <http://www.ar-tracking.com/ns#>
-    		   PREFIX dtrack: <http://localhost:8080/>
+    		   PREFIX dtrack: <{{ baseURI }}/>
     		   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
     		   ASK {
     		     dtrack:api ART:deviceState ART:Configured ;
     		     			ART:serverHost ?host ;
     		     			ART:serverPort ?hostPort ;
     		     			ART:dataPort ?clientPort ;
-    		     			actn:action <http://localhost:8080/actions/startMeasurement> , <http://localhost:8080/actions/tearDown> .
+    		     			actn:action <{{ baseURI }}/actions/startMeasurement> , <{{ baseURI }}/actions/tearDown> .
     		     			FILTER NOT EXISTS {
     		     			  dtrack:api ART:deviceState ART:Unconfigured ;
-    		     			  			 actn:action <http://localhost:8080/actions/configure> . } }''' ;
+    		     			  			 actn:action <{{ baseURI }}/actions/configure> . } }''' ;
     rdf:type sp:Ask ;
 	sp:where  ( [ sp:object     ART:Configured ;
                       sp:predicate  ART:deviceState ;

@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida.actions;
 
+import de.dfki.resc28.aida.Server;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -37,17 +38,17 @@ public class StartMeasurementAction extends Action implements IAction
 		
 		// create containers for targets and coordinateSystems
 		Model targetContainerModel = ModelFactory.createDefaultModel();
-		Resource targetContainer = targetContainerModel.createResource("http://localhost:8080/api/targets");
+		Resource targetContainer = targetContainerModel.createResource(Server.fBaseURI+"/api/targets");
 		targetContainerModel.add(targetContainer, RDF.type, ART.TargetContainer);
 		currentState.add(tracker, SPATIAL.spatialRelationship, targetContainer);
 		fGraphStore.createNamedGraph(targetContainer.getURI().toString(), targetContainerModel);
 
 		Model coordinateSystemContainerModel = ModelFactory.createDefaultModel();
-		Resource coordinateSystemContainer = coordinateSystemContainerModel.createResource("http://localhost:8080/api/coordinateSystems");
+		Resource coordinateSystemContainer = coordinateSystemContainerModel.createResource(Server.fBaseURI+"/api/coordinateSystems");
 		coordinateSystemContainerModel.add(coordinateSystemContainer, RDF.type, ART.CoordinateSystemContainer);
 		currentState.add(tracker, SPATIAL.coordinateSystem, coordinateSystemContainer);
-		fGraphStore.createNamedGraph(coordinateSystemContainer.getURI().toString(), coordinateSystemContainerModel);	
-		
+		fGraphStore.createNamedGraph(coordinateSystemContainer.getURI().toString(), coordinateSystemContainerModel);
+
 		return currentState;
 	}
 }

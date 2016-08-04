@@ -26,17 +26,17 @@
     sp:where  () 
   ] ;
   actn:produces [
-    sp:text '''PREFIX dtrack: <http://localhost:8080/>
-    		   PREFIX actions: <http://localhost:8080/api/actions/>
+    sp:text '''PREFIX dtrack: <{{ baseURI }}/>
+    		   PREFIX actions: <{{ baseURI }}/api/actions/>
     		   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
     		   PREFIX ART: <http://www.ar-tracking.com/ns#>
     		   PREFIX SPATIAL: <http://vocab.arvida.de/ns/spatial#>
     		   ASK {
     		     dtrack:api ART:deviceState ART:Started ;
-    		     SPATIAL:coordinateSystem   <http://localhost:8080/api/coordinateSystems> ;
-    		     SPATIAL:spatialRelationship  <http://localhost:8080/api/targets> ;
+    		     SPATIAL:coordinateSystem   <{{ baseURI }}/api/coordinateSystems> ;
+    		     SPATIAL:spatialRelationship  <{{ baseURI }}/api/targets> ;
     		     actn:action actions:stopMeasurement .
-    		     FILTER NOT EXISTS { dtrack:api actn:action actions:tearDown , actions:startMeasurement . } }''' ; 
+    		     FILTER NOT EXISTS { dtrack:api actn:action actions:tearDown , actions:startMeasurement . } }''' ;
     rdf:type sp:Ask ;
     sp:where  ( [ sp:object     ART:Started ;
                       sp:predicate  ART:deviceState ;

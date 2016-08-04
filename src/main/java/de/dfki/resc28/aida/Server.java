@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida;
 
+import com.hubspot.jinjava.Jinjava;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -20,9 +21,15 @@ import org.apache.jena.riot.RDFDataMgr;
 
 import de.dfki.resc28.aida.services.DTrackActionProvider;
 import de.dfki.resc28.aida.services.DebugService;
+import de.dfki.resc28.art4j.DTrackSDK;
 import de.dfki.resc28.igraphstore.IGraphStore;
 import de.dfki.resc28.igraphstore.jena.FusekiGraphStore;
 import de.dfki.resc28.igraphstore.jena.TDBGraphStore;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 
 /**
@@ -33,6 +40,7 @@ import de.dfki.resc28.igraphstore.jena.TDBGraphStore;
 public class Server extends Application
 {
 	public static IGraphStore fGraphStore = null;
+        public static String fBaseURI = null;
 
 	@Override
     public Set<Object> getSingletons()
@@ -74,6 +82,7 @@ public class Server extends Application
                             baseURI = "http://" + hostName;
                         }
                         System.out.format("AIDA: baseURI = %s%n", baseURI);
+                        fBaseURI = baseURI;
 
 			if (storage.equals("fuseki"))
 			{
@@ -100,34 +109,51 @@ public class Server extends Application
 		}
 	}
 
+        public static String streamToString(InputStream inputStream) {
+            Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        }
+
+        public static StringReader processResource(Jinjava jinjava, Map<String, Object> context, String name) {
+            String tmpl = streamToString(Server.class.getClassLoader().getResourceAsStream(name));
+            String result = jinjava.render(tmpl, context);
+            return new StringReader(result);
+        }
+
 	public static synchronized void initGraphStore(String baseURI)
 	{
 		System.out.println("AIDA: Initializing Graph Storage ...");
+
+                Jinjava jinjava = new Jinjava();
+                Map<String, Object> context = new HashMap<String, Object>();
+                context.put("baseURI", baseURI);
+
 		Server.fGraphStore.clearDefaultGraph();
 
 		Model machineModel = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(machineModel, Server.class.getClassLoader().getResourceAsStream("model.ttl"), baseURI, Lang.TURTLE);
+
+		RDFDataMgr.read(machineModel, processResource(jinjava, context, "model.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/model", machineModel);
 
 		Model initialState = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(initialState, Server.class.getClassLoader().getResourceAsStream("init.ttl"), baseURI, Lang.TURTLE);
+		RDFDataMgr.read(initialState, processResource(jinjava, context, "init.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/model/initial", initialState);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api", initialState);
 
 		Model configureAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(configureAction, Server.class.getClassLoader().getResourceAsStream("configure.ttl"), baseURI, Lang.TURTLE);
+		RDFDataMgr.read(configureAction, processResource(jinjava, context, "configure.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/configure", configureAction);
 
 		Model startMeasurementAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(startMeasurementAction, Server.class.getClassLoader().getResourceAsStream("startMeasurement.ttl"), baseURI, Lang.TURTLE);
+		RDFDataMgr.read(startMeasurementAction, processResource(jinjava, context, "startMeasurement.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/startMeasurement", startMeasurementAction);
 
 		Model stopMeasurementAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(stopMeasurementAction, Server.class.getClassLoader().getResourceAsStream("stopMeasurement.ttl"), baseURI, Lang.TURTLE);
+		RDFDataMgr.read(stopMeasurementAction, processResource(jinjava, context, "stopMeasurement.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/stopMeasurement", stopMeasurementAction);
 
 		Model tearDownAction = ModelFactory.createDefaultModel();
-		RDFDataMgr.read(tearDownAction, Server.class.getClassLoader().getResourceAsStream("tearDown.ttl"), baseURI, Lang.TURTLE);
+		RDFDataMgr.read(tearDownAction, processResource(jinjava, context, "tearDown.ttl"), baseURI, Lang.TURTLE);
 		Server.fGraphStore.replaceNamedGraph(baseURI+"/api/actions/tearDown", tearDownAction);
                 System.out.println("AIDA: Graph Storage Initialized");
 	}

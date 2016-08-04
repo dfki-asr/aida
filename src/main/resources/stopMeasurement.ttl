@@ -24,10 +24,10 @@
   actn:consumes    [ a         sp:Ask ;
                            sp:where  ()
                          ] ;
-  actn:produces    [ 
-    rdf:type sp:Ask ;   
-    sp:text '''PREFIX dtrack: <http://localhost:8080/>
-    		   PREFIX actions: <http://localhost:8080/api/actions/>
+  actn:produces    [
+    rdf:type sp:Ask ;
+    sp:text '''PREFIX dtrack: <{{ baseURI }}/>
+    		   PREFIX actions: <{{ baseURI }}/api/actions/>
     		   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
     		   PREFIX ART: <http://www.ar-tracking.com/ns#>
     		   PREFIX SPATIAL: <http://vocab.arvida.de/ns/spatial#>
@@ -36,8 +36,8 @@
     		     			actn:action actions:tearDown , actions:startMeasurement .
     		     FILTER NOT EXISTS {
     		       dtrack:api actn:action actions:stopMeasurement ;
-    		       			  SPATIAL:coordinateSystem   <http://localhost:8080/api/coordinateSystems> ;
-    		       			  SPATIAL:spatialRelationship  <http://localhost:8080/api/targets> ;
+    		       			  SPATIAL:coordinateSystem   <{{ baseURI }}/api/coordinateSystems> ;
+    		       			  SPATIAL:spatialRelationship  <{{ baseURI }}/api/targets> ;
     		       			  ART:deviceState ART:Started . } }''' ;
 
 sp:where  ( [ sp:object     ART:Configured ;
