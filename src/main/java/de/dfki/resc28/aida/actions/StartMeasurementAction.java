@@ -27,13 +27,13 @@ public class StartMeasurementAction extends Action implements IAction
 		this.fRDFType = ART.StartMeasurementAction;
 	}
 
-	public Model performTasks(Model consumable) 
+	public Model performTasks(Model consumable)
 	{
-		DTrackSDK.getInstance().startMeasurement();
-		
+                Server.getDTrack().startMeasurement();
+
 		Model currentState = fGraphStore.getDefaultGraph();
 		currentState.setNsPrefixes(SPATIAL.NAMESPACE);
-		
+
 		Resource tracker = currentState.listSubjectsWithProperty(RDF.type, ART.DTrack2).next().asResource();
 		
 		// create containers for targets and coordinateSystems

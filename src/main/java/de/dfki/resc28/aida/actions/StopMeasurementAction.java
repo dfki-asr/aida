@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida.actions;
 
+import de.dfki.resc28.aida.Server;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -27,10 +28,10 @@ public class StopMeasurementAction extends Action implements IAction
 		this.fRDFType = ART.StopMeasurementAction;
 	}
 
-	public Model performTasks(Model consumable) 
+	public Model performTasks(Model consumable)
 	{
-		DTrackSDK.getInstance().stopMeasurement();
-		
+		Server.getDTrack().stopMeasurement();
+
 		Model currentState = fGraphStore.getDefaultGraph();
 		Resource tracker = currentState.listSubjectsWithProperty(RDF.type, ART.DTrack2).next().asResource();
 		Resource targetContainer = (Resource)currentState.listObjectsOfProperty(SPATIAL.spatialRelationship).next();

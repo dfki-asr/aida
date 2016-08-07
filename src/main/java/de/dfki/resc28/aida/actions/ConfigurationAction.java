@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida.actions;
 
+import de.dfki.resc28.aida.Server;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -37,7 +38,7 @@ public class ConfigurationAction extends Action implements IAction {
         int dataPort = consumable.listObjectsOfProperty(ART.dataPort).next().asLiteral().getInt();
 
 		// do your domain-specific stuff here
-        DTrackSDK dtrack = DTrackSDK.getInstance(serverHost, serverPort, dataPort);
+        DTrackSDK dtrack = Server.getDTrack(serverHost, serverPort, dataPort);
         String channel = System.getProperty("aida.dtrack.channel");
         int channelNum = -1;
         if (channel != null) {
