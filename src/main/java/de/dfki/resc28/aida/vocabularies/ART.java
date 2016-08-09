@@ -35,10 +35,11 @@ public final class ART
   public static final Property serverHost = property(CONSTANTS.PROP_serverHost);
   public static final Property serverPort = property(CONSTANTS.PROP_serverPort);
   public static final Property dataPort = property(CONSTANTS.PROP_dataPort);
+  public static final Property outputChannel = property(CONSTANTS.PROP_outputChannel);
   public static final Property bodyID = property(CONSTANTS.PROP_bodyID);
-  
+
   /**
-   * Returns a Jena resource for the given namespace name 
+   * Returns a Jena resource for the given namespace name
    * @param nsName  the full namespace name of a vocabulary element as a string
    * @return the vocabulary element with given namespace name as a org.apache.jena.rdf.model.Resource
    */
@@ -97,9 +98,11 @@ public final class ART
     private static final String PROP_serverPort = nsName(PROP_LNAME_serverPort);
     private static final String PROP_LNAME_dataPort = "dataPort";
     private static final String PROP_dataPort = nsName(PROP_LNAME_dataPort);
+    private static final String PROP_LNAME_outputChannel = "outputChannel";
+    private static final String PROP_outputChannel = nsName(PROP_LNAME_outputChannel);
     private static final String PROP_LNAME_bodyID = "bodyID";
     private static final String PROP_bodyID = nsName(PROP_LNAME_bodyID);
-    
+
     /**
      * Returns the full namespace name of a vocabulary element as a string
      * @param localName  the local name of a vocabulary element as a string

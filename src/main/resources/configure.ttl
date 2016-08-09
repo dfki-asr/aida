@@ -26,7 +26,8 @@
     		   ASK {
     		     dtrack:api ART:serverHost ?host ;
     		     			ART:serverPort ?hostPort ;
-    		     			ART:dataPort ?clientPort . }''' ;
+    		     			ART:dataPort ? clientPort ;
+    		     			ART:outputChannel ? outputChannel . }''' ;
     rdf:type sp:Ask ;
     sp:where (
       [ sp:object _:host ;
@@ -37,6 +38,9 @@
         sp:subject <api> ]
       [ sp:object _:clientPort ;
         sp:predicate ART:dataPort ;
+        sp:subject <api> ]
+      [ sp:object _:outputChannel ;
+        sp:predicate ART:outputChannel ;
         sp:subject <api> ]
     )
   ] ;
@@ -49,6 +53,7 @@
     		     			ART:serverHost ?host ;
     		     			ART:serverPort ?hostPort ;
     		     			ART:dataPort ?clientPort ;
+    		     			ART:outputChannel ? outputChannel ;
     		     			actn:action <{{ baseURI }}/actions/startMeasurement> , <{{ baseURI }}/actions/tearDown> .
     		     			FILTER NOT EXISTS {
     		     			  dtrack:api ART:deviceState ART:Unconfigured ;
@@ -68,6 +73,10 @@
                     ]
                     [ sp:object     _:clientPort ;
                       sp:predicate  ART:dataPort ;
+                      sp:subject    <api>
+                    ]
+                    [ sp:object     _:outputChannel ;
+                      sp:predicate  ART:outputChannel ;
                       sp:subject    <api>
                     ]
                     [ sp:object     <api/actions/startMeasurement> ;
@@ -101,6 +110,10 @@ _:host
 _:hostPort
   rdf:type sp:Variable ;
   sp:varName  "hostPort" .
+
+_:outputChannel
+  rdf:type sp:Variable ;
+  sp:varName  "outputChannel" .
 
 _:clientPort
   rdf:type sp:Variable ;

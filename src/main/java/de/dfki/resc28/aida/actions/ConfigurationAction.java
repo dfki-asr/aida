@@ -15,6 +15,8 @@ import de.dfki.resc28.art4j.DTrackSDK;
 import de.dfki.resc28.igraphstore.IGraphStore;
 import de.dfki.resc28.sodalite.actions.Action;
 import de.dfki.resc28.sodalite.actions.IAction;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * @author resc01
@@ -36,32 +38,43 @@ public class ConfigurationAction extends Action implements IAction {
         String serverHost = consumable.listObjectsOfProperty(ART.serverHost).next().asLiteral().getString();
         int serverPort = consumable.listObjectsOfProperty(ART.serverPort).next().asLiteral().getInt();
         int dataPort = consumable.listObjectsOfProperty(ART.dataPort).next().asLiteral().getInt();
+        int outputChannel = consumable.listObjectsOfProperty(ART.outputChannel).next().asLiteral().getInt();
 
 		// do your domain-specific stuff here
         DTrackSDK dtrack = Server.getDTrack(serverHost, serverPort, dataPort);
         String channel = System.getProperty("aida.dtrack.channel");
-        int channelNum = -1;
-        if (channel != null) {
+        if (outputChannel <= 0 && channel != null) {
             try {
-                channelNum = Integer.parseInt(channel);
+                outputChannel = Integer.parseInt(channel);
             } catch (NumberFormatException ex) {
                 System.err.format("AIDA: Invalid aida.dtrack.channel property: %s%n", channel);
             }
         }
-        if (channelNum <= 0) {
-            channelNum = dtrack.findInactiveChannel(-1);
-            System.out.format("AIDA: Missing or invalid aida.dtrack.channel property, will use first inactive channel %d%n", channelNum);
+        if (outputChannel <= 0) {
+            outputChannel = dtrack.findInactiveChannel(DTrackSDK.NUM_DTRACK2_OUTPUT_CHANNELS);
+            System.out.format("AIDA: Missing or invalid aida.dtrack.channel property, will use first inactive channel %d%n", outputChannel);
         }
-        System.out.format("AIDA: Use DTrack channel: %d%n", channelNum);
+        System.out.format("AIDA: Use DTrack channel: %d%n", outputChannel);
         String localhost = System.getProperty("aida.dtrack.localhost");
+        if (localhost == null) {
+            try {
+                localhost = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException ex) {
+                System.out.format("AIDA: Could not get host address: %s%n", ex);
+            }
+        }
         if (localhost != null) {
-            dtrack.configureUDPChannel(channelNum, localhost, dataPort);
-            dtrack.activateChannel(channelNum, "all");
+            dtrack.configureUDPChannel(outputChannel, localhost, dataPort);
+            dtrack.activateChannel(outputChannel, "all");
+            System.out.format("AIDA: Configured output channel %d for host %s%n", outputChannel, localhost);
+        } else {
+            System.out.println("AIDA: Could not configure output channel, specify aida.dtrack.localhost property");
         }
         dtrack.stopMeasurement();
         currentState.add(tracker, ART.serverHost, currentState.createTypedLiteral(serverHost));
         currentState.add(tracker, ART.serverPort, currentState.createTypedLiteral(serverPort));
         currentState.add(tracker, ART.dataPort, currentState.createTypedLiteral(dataPort));
+        currentState.add(tracker, ART.outputChannel, currentState.createTypedLiteral(outputChannel));
 
         // hand-over modified state to updateState() in super
         return currentState;
