@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida.actions;
 
+import de.dfki.resc28.aida.Server;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 
@@ -21,11 +22,10 @@ public class TearDownAction extends Action implements IAction {
 		this.fRDFType = ART.TearDownAction;
 	}
 
-	public Model performTasks(Model consumable) 
-	{	
-		// TODO: implement tearDown in art4j JNI wrapper!
-		// DTrackSDK.getInstance().destroy()
-	
+	public Model performTasks(Model consumable)
+	{
+                Server.getDTrack().destroy();
+
 		Model currentState = fGraphStore.getDefaultGraph();
 		currentState.remove(currentState.listStatements(null, ART.serverHost, (Literal) null));
 		currentState.remove(currentState.listStatements(null, ART.serverPort, (Literal) null));

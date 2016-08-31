@@ -9,7 +9,6 @@
 @prefix http-methods: <http://www.w3.org/2011/http-methods#> .
 @prefix http-headers: <http://www.w3.org/2011/http-headers#> .
 @prefix http-codes: <http://www.w3.org/2011/http-statusCodes#> .
-@base <http://localhost:8080/>
 
 <api/actions/tearDown>
   rdf:type ART:TearDownAction , actn:NonSafe , actn:Idempotent ;
@@ -26,8 +25,8 @@
     sp:where  () 
   ] ;
   actn:produces [
-	sp:text '''PREFIX dtrack: <http://localhost:8080/>
-			   PREFIX actions: <http://localhost:8080/api/actions/>
+	sp:text '''PREFIX dtrack: <{{ baseURI }}/>
+			   PREFIX actions: <{{ baseURI }}/api/actions/>
 			   PREFIX actn:  <http://www.dfki.de/resc01/ns/actions#>
 			   PREFIX ART: <http://www.ar-tracking.com/ns#>
 			   PREFIX SPATIAL: <http://vocab.arvida.de/ns/spatial#>
@@ -37,8 +36,9 @@
 			     FILTER NOT EXISTS {
 			       dtrack:api actn:action actions:startMeasurement , actions:tearDown ;
 			       			  ART:serverHost _:s ; 
-			       			  ART:serverPort _:p ; 
-			       			  ART:dataPort _:d ; 
+			       			  ART:serverPort _:p ;
+			       			  ART:dataPort _:d ;
+			       			  ART:outputChannel _:c ;
 			       			  ART:deviceState ART:Configured . } }''' ;
     rdf:type sp:Ask ;
     sp:where  ( [ sp:object     ART:Unconfigured ;
@@ -69,6 +69,10 @@
                                                       ]
                                                       [ sp:object     [ sp:varName  "?2" ] ;
                                                         sp:predicate  ART:dataPort ;
+                                                        sp:subject    <api>
+                                                      ]
+                                                      [ sp:object     [ sp:varName  "?3" ] ;
+                                                        sp:predicate  ART:outputChannel ;
                                                         sp:subject    <api>
                                                       ]
                                                       [ sp:object     ART:Configured ;

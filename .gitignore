@@ -2,11 +2,15 @@
 .project
 .settings/
 target/
+deps/
 
 *.class
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+
+# Backup Files
+*~
 
 # Package Files #
 *.jar

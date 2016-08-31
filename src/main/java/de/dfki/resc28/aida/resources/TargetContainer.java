@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida.resources;
 
+import de.dfki.resc28.aida.Server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
@@ -40,22 +41,24 @@ public class TargetContainer extends Container implements IResource
 		super(resourceURI, graphStore);
 		this.fRDFType = ART.TargetContainer ;
 	}
-	
-	public Set<String> getAllowedMethods() 
+
+        @Override
+	public Set<String> getAllowedMethods()
     {
 		Set<String> allow = super.getAllowedMethods();
 		allow.clear();
 		allow.add(HttpMethod.GET);
 	    return allow;
     }
-	
+
+        @Override
 	public Response read(final String contentType)
 	{
-		DTrackSDK tracker = DTrackSDK.getInstance();
-		
+		DTrackSDK tracker = Server.getDTrack();
+
 		while (!tracker.receive())
 			System.out.println("Waiting for data frames!");
-		
+
 		final Model targetContainerModel =  ModelFactory.createDefaultModel();
 		targetContainerModel.setNsPrefixes(ART.NAMESPACE);
 		targetContainerModel.setNsPrefixes(LDP.NAMESPACE);

@@ -5,6 +5,7 @@
  */
 package de.dfki.resc28.aida.resources;
 
+import de.dfki.resc28.aida.Server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
@@ -52,12 +53,12 @@ public class TreeTarget extends Resource implements IResource
 		final Model treeTargetModel = fGraphStore.getNamedGraph(fURI);
 		org.apache.jena.rdf.model.Resource treeTarget = treeTargetModel.getResource(fURI);
 		int bodyID = treeTargetModel.listObjectsOfProperty(ART.bodyID).next().asLiteral().getInt();
-		
-		DTrackSDK tracker = DTrackSDK.getInstance();
-		
+
+		DTrackSDK tracker = Server.getDTrack();
+
 		while (!tracker.receive())
 			System.out.println("Waiting for data frames!");
-		
+
 		Body artBody = tracker.getBody(bodyID);
 		
 		org.apache.jena.rdf.model.Resource sr = treeTargetModel.createResource();

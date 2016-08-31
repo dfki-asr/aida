@@ -18,6 +18,7 @@
   		<graphStore>fuseki</graphStore>
     	<dataEndpoint>http://localhost:3030/ART/data</dataEndpoint>
     	<queryEndpoint>http://localhost:3030/ART/sparql</queryEndpoint>
+        <baseURI>http://localhost:8080</baseURI>
 	</properties>
 
 	<build>
@@ -85,10 +86,18 @@
 						<additionalClasspathDir>${project.build.directory}/nar</additionalClasspathDir>
 					</additionalClasspathDirs>
 				</configuration>
+                                <dependencies>
+                                    <dependency>
+                                        <artifactId>art4j</artifactId>
+                                        <groupId>de.dfki.resc28</groupId>
+                                        <version>0.1</version>
+                                        <type>nar</type>
+                                    </dependency>
+                                </dependencies>
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -152,7 +161,13 @@
 		    <artifactId>sodalite</artifactId>
 		    <version>0.1</version>
 		</dependency>
+                <dependency>
+                    <groupId>com.hubspot.jinjava</groupId>
+                    <artifactId>jinjava</artifactId>
+                    <version>2.1.0</version>
+                </dependency>
 	</dependencies>
+
 
 	<repositories>
     	<repository>
