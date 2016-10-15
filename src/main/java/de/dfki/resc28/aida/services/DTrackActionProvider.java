@@ -57,7 +57,7 @@ public class DTrackActionProvider extends ActionProvider
 	
 	@Path("{a: targets|coordinateSystems}")
 	@GET
-	@Produces({ Constants.CT_TEXT_TURTLE, Constants.CT_APPLICATION_RDFXML, Constants.CT_APPLICATION_XTURTLE, Constants.CT_APPLICATION_JSON, Constants.CT_APPLICATION_LD_JSON })
+	@Produces({ Constants.CT_TEXT_TURTLE, Constants.CT_APPLICATION_RDFXML, Constants.CT_APPLICATION_XTURTLE, Constants.CT_APPLICATION_JSON, Constants.CT_APPLICATION_JSON_LD })
 	public Response getSubResource( @HeaderParam(HttpHeaders.ACCEPT) String acceptType )
 	{
 		IResource r = getResourceManager().get(getCanonicalURL(fRequestUrl.getRequestUri()));
@@ -80,7 +80,7 @@ public class DTrackActionProvider extends ActionProvider
 	
 	@Path("targets/{id}")
 	@GET
-	@Produces({ Constants.CT_TEXT_TURTLE, Constants.CT_APPLICATION_RDFXML, Constants.CT_APPLICATION_XTURTLE, Constants.CT_APPLICATION_JSON, Constants.CT_APPLICATION_LD_JSON })
+	@Produces({ Constants.CT_TEXT_TURTLE, Constants.CT_APPLICATION_RDFXML, Constants.CT_APPLICATION_XTURTLE, Constants.CT_APPLICATION_JSON, Constants.CT_APPLICATION_JSON_LD })
 	public Response getTargetSubResource( @HeaderParam(HttpHeaders.ACCEPT) String acceptType )
 	{
 		IResource r = getResourceManager().get(getCanonicalURL(fRequestUrl.getRequestUri()));
